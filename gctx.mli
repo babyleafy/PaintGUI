@@ -9,11 +9,7 @@
     absolute positions on the screen.
 
     The graphics context also includes other information for basic drawing (such
-    as the current pen color.)
-
-    Note that this module defines a persistent (immutable) data structure. The
-    operations here use a given graphics context to create a new one with the
-    specified characteristics. They do not modify their arguments. *)
+    as the current pen color.)*)
 
 (** The main (abstract) type of graphics contexts. *)
 type gctx
