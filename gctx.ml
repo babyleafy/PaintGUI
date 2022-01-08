@@ -11,17 +11,7 @@
    screen.
 
    The graphics context also includes other information for basic
-   drawing (such as the current pen color.)
-
-   Note that this module defines a persistent (immutable) data
-   structure. The operations here use a given graphics context to
-   create a new one with the specified characteristics. They do not
-   modify their arguments. *)
-
-(* (We use the module name Graphics in this module to refer to a "shim
-   module" that connects to either the native or the javascript
-   graphics.  You do not need to understand the details of how this
-   works.) *)
+   drawing (such as the current pen color.)*)
 
 open Js_of_ocaml
 open Js_of_ocaml_lwt
@@ -53,9 +43,7 @@ let thick : thickness = {th = 5}
 (**    Basic Gctx operations   *)
 (*******************************)
 
-(** The main type of graphics contexts. Note that none of the
-   components are mutable. (TODO: You will need to modify this type
-   definition when you get to Task 5.) *)
+(** The main type of graphics contexts. *)
 type gctx = {
   x: int;         (** offset from (0,0) in local coordinates *)
   y: int;
@@ -85,7 +73,6 @@ let open_graphics () =
     end
 
 (** The top-level graphics context *)
-(* TODO: you will need to modify this variable when you get to Task 5. *)
 let top_level : gctx =
   { x = 0;
     y = 0;
@@ -109,7 +96,6 @@ let with_thickness (g: gctx) (th: thickness) : gctx =
 
 (** Set the OCaml graphics library's internal state according to the
    Gctx settings.  Initially, this just sets the current pen color. *)
-(* TODO: You will need to modify this definition for Task 5. *)
 let set_graphics_state (gc: gctx) : unit =
   let c = gc.color in
   let {th} = gc.thickness in
@@ -128,23 +114,12 @@ let graphics_size_x () =
 let graphics_size_y () =
   if graphics_opened.contents then Graphics.size_y () else 480
 
-(* A main purpose of the graphics context is to provide mapping between
-   widget-local coordinates and the ocaml coordinates of the graphics
-   library. Part of that translation comes from the offset stored in the
-   graphics context itself. The translation needs to know where the widget
-   is on the screen. The other part of the translation is the y axis flip.
-   The OCaml library puts (0,0) at the bottom left corner of the window.
-   We'd like our GUI library to put (0,0) at the top left corner and
-   increase the y-coordinate as we go *down* the screen. *)
-
 (** A widget-relative position *)
 type position = int * int
 
 (* The next two functions translate between the coordinate system we
    are using for the widget library and the native coordinates of the
-   Graphics module.  Remember to ALWAYS call these functions before
-   passing widget-local points to the Graphics module or
-   vice-versa. *)
+   Graphics module.*)
 
 (** Convert widget-local coordinates (x,y) to OCaml graphics
     coordinates, relative to the graphics context. *)
@@ -199,11 +174,8 @@ let draw_string (g: gctx) (p: position) (s: string) : unit =
   Graphics.draw_string s
 
 (** Display a rectangle with upper-left corner at position
-    with the specified dimension. Remember that Graphics.draw_rect
-    draws from the bottom-left by default, so you'll have to account
-    for this. *)
-(* TODO: you will need to make this function actually draw a
-   rectangle for Task 0.                                     *)
+    with the specified dimension.*)
+
 let draw_rect (g: gctx) (p1: position) ((w, h): dimension) : unit =
   set_graphics_state g;
   let (x, y) = ocaml_coords g p1 in
@@ -219,8 +191,6 @@ let fill_rect (g: gctx) (p1: position) ((w, h): dimension) : unit =
   Graphics.fill_rect x (y - h) w h
 
 (** Draw an ellipse at the given position with the given radii *)
-(* TODO: you will need to make this function actually draw an
-   ellipse for Task 0.  *)
 let draw_ellipse (g: gctx) (p: position) (rx: int) (ry: int) : unit =
   set_graphics_state g;
   let (x, y) = ocaml_coords g p in
@@ -244,9 +214,6 @@ let text_size (text: string) : dimension =
     (w+1, h)  (* Web browser font widths seem to be smaller than desirable *)
   else (10 * String.length text, 15)
 
-(* TODO: You will need to add several "wrapped" versions of ocaml graphics *)
-(* functions here for Tasks 3, 5 and 6 *)
-
 (** Draw a point at position **)
 let draw_point (g: gctx) (p: position) : unit =
   set_graphics_state g;
@@ -264,9 +231,6 @@ let draw_points (g: gctx) (plist: position list) : unit =
 (************************)
 (**    Event Handling   *)
 (************************)
-
-(* This part of the module adapts OCaml's native event handling to
-   something that more closely resembles that found in Java. *)
 
 (** Types of events that could occur *)
 type event_type =
