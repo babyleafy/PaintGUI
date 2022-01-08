@@ -31,7 +31,7 @@ let space (p: Gctx.dimension) : widget =
 let border (w: widget) : widget =
   { repaint = (fun (g: Gctx.gctx) ->
       let (width, height) = w.size () in
-      let x = width + 3 in    (* not "+ 4" because we start at 0! *)
+      let x = width + 3 in   
       let y = height + 3 in
       Gctx.draw_line g (0,0) (x,0);
       Gctx.draw_line g (0,0) (0, y);
@@ -72,9 +72,7 @@ let hpair (w1:widget) (w2:widget) : widget = {
    }
 
 (** The vpair widget lays out two widgets vertically, aligned at their
-   left edges.
-
-   TODO: You will need to implement vpair in Task 1 *)
+   left edges.*)
 let vpair (w1: widget) (w2: widget) : widget = {
    repaint = (fun (g: Gctx.gctx) -> w1.repaint g;
      let g = Gctx.translate g (0, snd (w1.size())) in
@@ -88,16 +86,6 @@ let vpair (w1: widget) (w2: widget) : widget = {
           let (x2, y2) = w2.size () in (max x1 x2, y1 + y2))
 }
 
-(* TIP: the OCaml List module provides a function fold_right
-   (List.fold_right) that behaves like the "fold" function we've seen
-   on previous homeworks except that it takes its arguments in a
-   different order.
-
-   Also, if you look at the List interface, you will see that there is
-   a fold_left function. You may want to think about what this does,
-   and how it's different from the fold you're used to.  *)
-
-(* TODO: You will need to implement list_layout in Task 1 *)
 let list_layout (pair: widget -> widget -> widget)
          (ws: widget list) : widget =
   List.fold_right pair ws (space (0,0))
@@ -109,14 +97,6 @@ let vlist (ws: widget list) : widget = list_layout vpair ws
 (*****************************)
 (**       Label Widgets      *)
 (*****************************)
-
-(* Throughout the paint program, we will find the need to associate some value
-   with a widget, and also to provide a way to update that value. The simplest
-   example of this is a label widget, where the value we're dealing with is a
-   string (which is displayed by the label).
-
-   Because both the widget and the label_controller share the same, mutable
-   value, the constructor must create both together.  *)
 
 (** A record of functions that allows us to read and write the string
     associated with a label. *)
@@ -143,9 +123,6 @@ let label (s: string) : widget * label_controller =
 
 (** An event listener processes events as they "flow" through the widget
     hierarchy.
-
-    The file notifierdemo.ml gives a longer explanation of what notifiers
-    and event_listeners are.
 *)
 
 type event_listener = Gctx.gctx -> Gctx.event -> unit
@@ -236,22 +213,12 @@ let canvas (dim: Gctx.dimension) (f : Gctx.gctx -> unit)
 (*****************************************)
 (**              Checkbox                *)
 (*****************************************)
-(* TODO: Task 5 requires you to develop a checkbox widget *)
 
-
-(** A checkbox is a controller for a boolean value associated with a widget.
-   Other widgets might store other data -- a slider might store an integer, for
-   example, and the label_controller we saw above is specialized to strings.
-
-   Here we introduce a general-purpose value_controller, which stores a generic
+(**A general-purpose value_controller, which stores a generic
    value. This controller can read (via get_value) and write the value (via
    change_value). It also allows change listeners to be registered by the
    application. All of the added listeners are run whenever this value is
    changed.
-
-   We will use this value_controller as part of the checkbox implementation, and
-   you are free to use it (if needed) for whatever widget you create in
-   Task 6.
 *)
 type 'a value_controller = {
   add_change_listener : ('a -> unit) -> unit;
@@ -261,10 +228,6 @@ type 'a value_controller = {
 
 type 'a state = {mutable value: 'a; mutable listeners: ('a -> unit) list}
 
-(** TODO: The first part of task 5 requires you to implement the following
-    generic function. This function takes a value of type 'a and returns a
-    value controller for it. Carefully consider what state needs to be
-    associated with any value controller. *)
 let make_controller (v: 'a) : 'a value_controller =
   let listeners = ref [] in
   let valu = ref v in
@@ -274,17 +237,6 @@ let make_controller (v: 'a) : 'a value_controller =
    change_value = (fun v -> valu.contents <- v;
                    List.iter (fun f -> f v) listeners.contents)}
 
-
-(** TODO: Don't forget to use the helper function you defined above
-   when implementing the checkbox function!
-
-   If your checkbox implementation does not work, do _not_ comment it
-   out, because your code will not compile upon submission. Instead,
-   you can replace the function body with
-
-      failwith "Checkbox: unimplemented"
-
-    before submitting your code. *)
 let checkbox (init: bool) (s: string) : widget * bool value_controller =
   let vcontrol1 = make_controller init in
   let (lbl, lc) = label s in
@@ -306,10 +258,6 @@ let checkbox (init: bool) (s: string) : widget * bool value_controller =
 (*****************************************)
 (**          Additional widgets          *)
 (*****************************************)
-
-(* TODO: In Task 6 you may choose to add a radio_button widget, a
-   slider, or (after discussing your idea with course staff via
-   a private Piazza post) some other widget of your choice. *)
 
 (** Creates a radio_button widget and its controllers*)
 let radio_button (init: bool) (s: string) : 
